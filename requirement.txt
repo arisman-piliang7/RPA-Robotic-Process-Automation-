@@ -1,1 +1,5 @@
+selenium
+webdriver-manager
+openpyxl
 pandas
+customtkinter
