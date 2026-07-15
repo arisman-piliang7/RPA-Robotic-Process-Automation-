@@ -9,6 +9,7 @@ from typing import Optional
 
 from selenium.webdriver.remote.webdriver import WebDriver
 
+from src.automation.base_page import BasePage
 from src.automation.login_page import LoginPage
 from src.automation.survey_pangkalan_page import SurveyPangkalanPage, SurveyReport
 from src.config import Config
@@ -70,7 +71,7 @@ class DDMSAutomation:
         except Exception as exc:
             logger.critical("Automasi berhenti karena error: %s", exc, exc_info=True)
             if self.driver and self.config.SCREENSHOT_ON_ERROR:
-                base = BasePage(self.driver, self.config)  # noqa: F821
+                base = BasePage(self.driver, self.config)
                 base.take_screenshot("critical_error")
             raise
         finally:
@@ -142,6 +143,3 @@ class DDMSAutomation:
                 pass
             self.driver = None
 
-
-# Import BasePage di sini untuk menghindari circular import
-from src.automation.base_page import BasePage  # noqa: E402
