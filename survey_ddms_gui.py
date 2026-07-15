@@ -1,10 +1,6 @@
 """
 Otomatisasi Buka Ulang Inputan Survey - Kemitraan Pertamina (GUI)
 =====================================================================
-Versi GUI dari auto_survey_excel.py - logika inti (xpath, urutan klik,
-format Excel, mekanisme resume & auto-restart browser) TIDAK DIUBAH.
-Hanya dibungkus tampilan grafis + kontrol pause/resume/stop + progress bar.
-
 Requirements:
     pip install selenium webdriver-manager openpyxl pandas customtkinter
 
