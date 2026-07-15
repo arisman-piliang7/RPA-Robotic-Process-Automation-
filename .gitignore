@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Environment & secrets
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+*.xml
+
+# Output & logs (file sementara, bukan template)
+output/*.xlsx
+output/*.txt
+output/screenshots/*.png
+logs/*.log
+
+# OS
+.DS_Store
+Thumbs.db
