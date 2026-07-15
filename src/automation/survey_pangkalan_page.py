@@ -259,8 +259,7 @@ class SurveyPangkalanPage(BasePage):
             rows = self.driver.find_elements(*_TABLE_ROWS)
             for idx, row in enumerate(rows):
                 cells = row.find_elements(By.TAG_NAME, "td")
-                row_id = cells[0].text.strip() if cells else ""
-                row_name = cells[1].text.strip() if len(cells) > 1 else ""
+                row_id, row_name = self._extract_row_data(cells, idx)
                 if row_id == pangkalan_id:
                     logger.info("Pangkalan ID '%s' ditemukan di halaman %d.", pangkalan_id, page_num)
                     return self._open_survey_for_row(row, idx, row_id, row_name)
@@ -281,6 +280,22 @@ class SurveyPangkalanPage(BasePage):
     # Helper Privat
     # ------------------------------------------------------------------
 
+    @staticmethod
+    def _extract_row_data(cells, row_idx: int = 0) -> tuple:
+        """
+        Ekstrak ID dan nama pangkalan dari sel-sel baris tabel.
+
+        Args:
+            cells: List elemen sel <td> dari satu baris tabel.
+            row_idx: Indeks baris, digunakan sebagai fallback ID.
+
+        Returns:
+            Tuple (pangkalan_id, pangkalan_name).
+        """
+        pangkalan_id = cells[0].text.strip() if cells else f"row_{row_idx}"
+        pangkalan_name = cells[1].text.strip() if len(cells) > 1 else ""
+        return pangkalan_id, pangkalan_name
+
     def _process_current_page(self) -> List[SurveyResult]:
         """Proses semua baris di halaman tabel saat ini."""
         results: List[SurveyResult] = []
@@ -297,8 +312,7 @@ class SurveyPangkalanPage(BasePage):
                 break
             row = rows[idx]
             cells = row.find_elements(By.TAG_NAME, "td")
-            pangkalan_id = cells[0].text.strip() if cells else f"row_{idx}"
-            pangkalan_name = cells[1].text.strip() if len(cells) > 1 else ""
+            pangkalan_id, pangkalan_name = self._extract_row_data(cells, idx)
 
             result = self._open_survey_for_row(row, idx, pangkalan_id, pangkalan_name)
             results.append(result)

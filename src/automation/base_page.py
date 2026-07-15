@@ -77,10 +77,7 @@ class BasePage:
         if clear:
             element.clear()
         element.send_keys(text)
-        if element.get_attribute("type") == "password":
-            logger.debug("Mengetik ke [%s] '%s': [TERSEMBUNYI]", by, value)
-        else:
-            logger.debug("Mengetik ke [%s] '%s': '%s'", by, value, text)
+        logger.debug("Mengetik ke [%s] '%s'", by, value)
 
     def get_text(self, by: str, value: str) -> str:
         """Ambil teks dari elemen."""

@@ -14,93 +14,71 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
 
+@pytest.fixture
+def fresh_config():
+    """
+    Kembalikan kelas Config yang sudah di-reload agar perubahan env terdeteksi.
+    Juga mereset atribut wajib ke string kosong untuk memudahkan pengujian validasi.
+    """
+    import importlib
+    import src.config as cfg_module
+
+    importlib.reload(cfg_module)
+    return cfg_module.Config
+
+
 class TestConfig:
     """Pengujian modul Config."""
 
-    def test_validate_raises_when_username_missing(self, monkeypatch):
+    def test_validate_raises_when_username_missing(self, fresh_config):
         """Config.validate() harus raise ValueError jika USERNAME kosong."""
-        monkeypatch.setenv("DDMS_USERNAME", "")
-        monkeypatch.setenv("DDMS_PASSWORD", "secret")
-        monkeypatch.setenv("DDMS_URL", "https://example.com")
-
-        # Re-import untuk mendapat nilai env baru
-        import importlib
-        import src.config as cfg_module
-
-        importlib.reload(cfg_module)
-        Config = cfg_module.Config
-        Config.USERNAME = ""
-        Config.PASSWORD = "secret"
-        Config.DDMS_URL = "https://example.com"
+        fresh_config.USERNAME = ""
+        fresh_config.PASSWORD = "secret"
+        fresh_config.DDMS_URL = "https://example.com"
 
         with pytest.raises(ValueError, match="DDMS_USERNAME"):
-            Config.validate()
+            fresh_config.validate()
 
-    def test_validate_raises_when_password_missing(self, monkeypatch):
+    def test_validate_raises_when_password_missing(self, fresh_config):
         """Config.validate() harus raise ValueError jika PASSWORD kosong."""
-        import importlib
-        import src.config as cfg_module
-
-        importlib.reload(cfg_module)
-        Config = cfg_module.Config
-        Config.USERNAME = "user"
-        Config.PASSWORD = ""
-        Config.DDMS_URL = "https://example.com"
+        fresh_config.USERNAME = "user"
+        fresh_config.PASSWORD = ""
+        fresh_config.DDMS_URL = "https://example.com"
 
         with pytest.raises(ValueError, match="DDMS_PASSWORD"):
-            Config.validate()
+            fresh_config.validate()
 
-    def test_validate_passes_when_all_set(self, monkeypatch):
+    def test_validate_passes_when_all_set(self, fresh_config):
         """Config.validate() tidak boleh raise jika semua nilai wajib terisi."""
-        import importlib
-        import src.config as cfg_module
-
-        importlib.reload(cfg_module)
-        Config = cfg_module.Config
-        Config.USERNAME = "user"
-        Config.PASSWORD = "pass"
-        Config.DDMS_URL = "https://example.com"
+        fresh_config.USERNAME = "user"
+        fresh_config.PASSWORD = "pass"
+        fresh_config.DDMS_URL = "https://example.com"
 
         # Tidak boleh raise
-        Config.validate()
+        fresh_config.validate()
 
-    def test_ensure_dirs_creates_directories(self, tmp_path):
+    def test_ensure_dirs_creates_directories(self, fresh_config, tmp_path):
         """Config.ensure_dirs() harus membuat direktori output, log, dan screenshot."""
-        import importlib
-        import src.config as cfg_module
+        fresh_config.OUTPUT_DIR = tmp_path / "output"
+        fresh_config.LOG_DIR = tmp_path / "logs"
+        fresh_config.SCREENSHOT_DIR = tmp_path / "output" / "screenshots"
 
-        importlib.reload(cfg_module)
-        Config = cfg_module.Config
-        Config.OUTPUT_DIR = tmp_path / "output"
-        Config.LOG_DIR = tmp_path / "logs"
-        Config.SCREENSHOT_DIR = tmp_path / "output" / "screenshots"
+        fresh_config.ensure_dirs()
 
-        Config.ensure_dirs()
+        assert fresh_config.OUTPUT_DIR.exists()
+        assert fresh_config.LOG_DIR.exists()
+        assert fresh_config.SCREENSHOT_DIR.exists()
 
-        assert Config.OUTPUT_DIR.exists()
-        assert Config.LOG_DIR.exists()
-        assert Config.SCREENSHOT_DIR.exists()
-
-    def test_headless_defaults_to_false(self, monkeypatch):
+    def test_headless_defaults_to_false(self, fresh_config, monkeypatch):
         """HEADLESS default harus False."""
         monkeypatch.delenv("HEADLESS", raising=False)
-        import importlib
-        import src.config as cfg_module
-
-        importlib.reload(cfg_module)
-        Config = cfg_module.Config
         # Default dari getenv dengan fallback "false"
-        assert Config.HEADLESS is False
+        assert fresh_config.HEADLESS is False
 
-    def test_browser_defaults_to_chrome(self, monkeypatch):
+    def test_browser_defaults_to_chrome(self, fresh_config, monkeypatch):
         """BROWSER default harus 'chrome'."""
         monkeypatch.delenv("BROWSER", raising=False)
-        import importlib
-        import src.config as cfg_module
-
-        importlib.reload(cfg_module)
-        Config = cfg_module.Config
-        assert Config.BROWSER == "chrome"
+        assert fresh_config.BROWSER == "chrome"
 
 
 class TestLogger:
