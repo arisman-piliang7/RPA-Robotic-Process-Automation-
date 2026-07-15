@@ -41,7 +41,7 @@ def generate_excel_report(report: "SurveyReport", output_dir: Path) -> Path:
 
     # --- Header ---
     headers = ["No", "ID Pangkalan", "Nama Pangkalan", "Status", "Keterangan"]
-    header_fill = PatternFill("solid", fgColor="1F4E79")
+    header_fill = PatternFill(patternType="solid", fgColor="1F4E79")
     header_font = Font(bold=True, color="FFFFFF")
     header_align = Alignment(horizontal="center", vertical="center")
 
@@ -54,9 +54,9 @@ def generate_excel_report(report: "SurveyReport", output_dir: Path) -> Path:
 
     # --- Status color mapping ---
     status_fill = {
-        "success": PatternFill("solid", fgColor="C6EFCE"),
-        "failed": PatternFill("solid", fgColor="FFC7CE"),
-        "skipped": PatternFill("solid", fgColor="FFEB9C"),
+        "success": PatternFill(patternType="solid", fgColor="C6EFCE"),
+        "failed": PatternFill(patternType="solid", fgColor="FFC7CE"),
+        "skipped": PatternFill(patternType="solid", fgColor="FFEB9C"),
     }
     status_label = {
         "success": "Berhasil",

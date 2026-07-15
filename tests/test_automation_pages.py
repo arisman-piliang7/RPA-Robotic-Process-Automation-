@@ -172,10 +172,11 @@ class TestSurveyPangkalanPage:
         from src.automation.survey_pangkalan_page import SurveyPangkalanPage
 
         page = SurveyPangkalanPage(mock_driver, mock_config)
-        # Tabel kosong
+        # Tabel kosong dan tidak ada halaman berikutnya
         mock_driver.find_elements.return_value = []
 
-        result = page.open_survey_single("99999")
+        with patch.object(page, "_go_to_next_page", return_value=False):
+            result = page.open_survey_single("99999")
 
         assert result.status == "skipped"
         assert result.pangkalan_id == "99999"

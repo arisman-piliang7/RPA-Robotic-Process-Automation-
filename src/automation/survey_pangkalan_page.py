@@ -244,6 +244,7 @@ class SurveyPangkalanPage(BasePage):
     def open_survey_single(self, pangkalan_id: str) -> SurveyResult:
         """
         Buka survey untuk satu pangkalan berdasarkan ID.
+        Mencari di semua halaman tabel jika perlu.
 
         Args:
             pangkalan_id: ID pangkalan yang akan dibuka surveynya.
@@ -251,16 +252,24 @@ class SurveyPangkalanPage(BasePage):
         Returns:
             SurveyResult untuk pangkalan tersebut.
         """
-        logger.info("Membuka survey untuk pangkalan ID: %s", pangkalan_id)
-        rows = self.driver.find_elements(*_TABLE_ROWS)
-        for idx, row in enumerate(rows):
-            cells = row.find_elements(By.TAG_NAME, "td")
-            row_id = cells[0].text.strip() if cells else ""
-            row_name = cells[1].text.strip() if len(cells) > 1 else ""
-            if row_id == pangkalan_id:
-                return self._open_survey_for_row(row, idx, row_id, row_name)
+        logger.info("Mencari pangkalan ID '%s' di semua halaman...", pangkalan_id)
+        page_num = 1
+        while True:
+            logger.debug("Mencari di halaman ke-%d...", page_num)
+            rows = self.driver.find_elements(*_TABLE_ROWS)
+            for idx, row in enumerate(rows):
+                cells = row.find_elements(By.TAG_NAME, "td")
+                row_id = cells[0].text.strip() if cells else ""
+                row_name = cells[1].text.strip() if len(cells) > 1 else ""
+                if row_id == pangkalan_id:
+                    logger.info("Pangkalan ID '%s' ditemukan di halaman %d.", pangkalan_id, page_num)
+                    return self._open_survey_for_row(row, idx, row_id, row_name)
 
-        logger.warning("Pangkalan ID '%s' tidak ditemukan di halaman ini.", pangkalan_id)
+            if not self._go_to_next_page():
+                break
+            page_num += 1
+
+        logger.warning("Pangkalan ID '%s' tidak ditemukan di seluruh halaman.", pangkalan_id)
         return SurveyResult(
             pangkalan_id=pangkalan_id,
             pangkalan_name="",
